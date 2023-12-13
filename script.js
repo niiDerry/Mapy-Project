@@ -20,10 +20,28 @@ if (navigator.geolocation)
       console.log(
         `https://www.google.com/maps/@${latitude},${longitude},11z?entry=ttu`
       );
+
+      const coords = [latitude, longitude];
+
+      // *** DISPLAYING A MAP USING LEAFLET LIBRARY ***
+      // -----------------------------------------------------
+      const map = L.map('map').setView(coords, 13);
+
+      L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+        .openPopup();
+
+      map.on();
     },
     function () {
       alert('Could not get your position');
     }
   );
 
-// *** DISPLAYING A MAP USING LEAFLET LIBRARY ***
+// ** DISPLAYING A MAP MARKER **📌
