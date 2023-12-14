@@ -11,6 +11,7 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+let map, mapEvent;
 // using geolocation
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition(
@@ -23,25 +24,56 @@ if (navigator.geolocation)
 
       const coords = [latitude, longitude];
 
-      // *** DISPLAYING A MAP USING LEAFLET LIBRARY ***
+      // DISPLAYING A MAP USING LEAFLET LIBRARY ***
       // -----------------------------------------------------
-      const map = L.map('map').setView(coords, 13);
+      map = L.map('map').setView(coords, 13);
 
       L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      L.marker(coords)
-        .addTo(map)
-        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-        .openPopup();
-
-      map.on();
+      // Handling clicks on maps----------------------------------
+      map.on('click', function (mapE) {
+        mapEvent = mapE;
+        form.classList.remove('hidden');
+        inputDistance.focus();
+      });
     },
     function () {
       alert('Could not get your position');
     }
   );
 
-// ** DISPLAYING A MAP MARKER **📌
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  // clear input fields
+  inputDistance.value =
+    inputDuration.value =
+    inputCadence.value =
+    inputElevation.value =
+      '';
+
+  //  DISPLAYING A MAP MARKER **📌
+  console.log(mapEvent);
+  const { lat, lng } = mapEvent.latlng;
+  L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(
+      L.popup({
+        maxwidth: 250,
+        minWidth: 150,
+        autoClose: false,
+        closeOnClick: false,
+        className: 'running-popup',
+      })
+    )
+    .setPopupContent('workout')
+    .openPopup();
+});
+
+// RENDERING WORKOUT INPUT FORM**
+inputType.addEventListener('change', function (event) {
+  inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+});
